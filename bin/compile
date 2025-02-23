@@ -19,7 +19,7 @@ mkdir -p "$INSTALL_DIR"
 
 echo 'Downloading latest stable version of yt-dlp' | indent
 
-curl -s --fail --retry 3 --retry-connrefused --connect-timeout "${CURL_CONNECT_TIMEOUT:-3}" "$INSTALL_URL" -o "$INSTALL_PATH"
+curl -sL --fail --retry 3 --retry-connrefused --connect-timeout "${CURL_CONNECT_TIMEOUT:-3}" "$INSTALL_URL" -o "$INSTALL_PATH"
 chmod a+rx "$INSTALL_PATH"
 
 # Write profile.d script for runtime support
