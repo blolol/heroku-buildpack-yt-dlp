@@ -3,7 +3,6 @@
 
 set -eu -o pipefail
 
-BUILDPACK_DIR="$(dirname "$(dirname "$0")")"
 BUILD_DIR="$1"
 CACHE_DIR="$2"
 
@@ -14,18 +13,21 @@ indent() {
 echo '-----> Installing yt-dlp'
 
 INSTALL_URL="https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp"
-INSTALL_DIR="$BUILD_DIR/vendor"
-mkdir -p "$INSTALL_DIR"
+INSTALL_DIR="$BUILD_DIR/.yt-dlp/bin"
 INSTALL_PATH="$INSTALL_DIR/yt-dlp"
+mkdir -p "$INSTALL_DIR"
 
 echo 'Downloading latest stable version of yt-dlp' | indent
 
 curl -s --fail --retry 3 --retry-connrefused --connect-timeout "${CURL_CONNECT_TIMEOUT:-3}" "$INSTALL_URL" -o "$INSTALL_PATH"
 chmod a+rx "$INSTALL_PATH"
 
-PROFILE_PATH="$BUILD_DIR/.profile.d/yt-dlp.sh"
-mkdir -p "$(dirname "$PROFILE_PATH")"
-echo 'export PATH="$PATH:${HOME}/vendor/yt-dlp"' > $PROFILE_PATH
+# Write profile.d script for runtime support
+mkdir -p "$BUILD_DIR/.profile.d"
+paths=$(cd "$BUILD_DIR" && find ./.yt-dlp -iregex '.*/bin' -type d)
+cat <<EOF > "$BUILD_DIR/.profile.d/yt-dlp.sh"
+export PATH="$(echo "$paths" | xargs -n 1 | sed 's/^./$HOME/' | paste -s -d ':' -):\$PATH"
+EOF
 
 echo "Installed yt-dlp $("$INSTALL_PATH" --version) to $INSTALL_PATH" | indent
 echo 'Done' | indent
