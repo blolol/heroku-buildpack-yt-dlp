@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+# Usage: compile <build dir> <cache dir> <env dir>
+
+set -eu -o pipefail
+
+BUILDPACK_DIR="$(dirname "$(dirname "$0")")"
+BUILD_DIR="$1"
+CACHE_DIR="$2"
+
+indent() {
+  sed -u 's/^/       /'
+}
+
+echo '-----> Installing yt-dlp'
+
+INSTALL_URL="https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp"
+INSTALL_DIR="$BUILD_DIR/vendor"
+mkdir -p "$INSTALL_DIR"
+INSTALL_PATH="$INSTALL_DIR/yt-dlp"
+
+echo 'Downloading latest stable version of yt-dlp' | indent
+
+curl -s --fail --retry 3 --retry-connrefused --connect-timeout "${CURL_CONNECT_TIMEOUT:-3}" "$INSTALL_URL" -o "$INSTALL_PATH"
+chmod a+rx "$INSTALL_PATH"
+
+PROFILE_PATH="$BUILD_DIR/.profile.d/yt-dlp.sh"
+mkdir -p "$(dirname "$PROFILE_PATH")"
+echo 'export PATH="$PATH:${HOME}/vendor/yt-dlp"' > $PROFILE_PATH
+
+echo "Installed yt-dlp $("$INSTALL_PATH" --version) to $INSTALL_PATH" | indent
+echo 'Done' | indent

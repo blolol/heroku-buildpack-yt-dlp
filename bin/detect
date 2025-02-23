@@ -1,0 +1,8 @@
+#!/usr/bin/env bash
+# Usage: detect <build dir>
+
+set -eu -o pipefail
+
+# This buildpack is always valid
+echo 'yt-dlp'
+exit 0
