@@ -10,14 +10,12 @@ indent() {
   sed -u 's/^/       /'
 }
 
-echo '-----> Installing yt-dlp'
+echo '-----> Installing latest stable version of yt-dlp'
 
 INSTALL_URL="https://github.com/yt-dlp/yt-dlp/releases/latest/download/yt-dlp"
 INSTALL_DIR="$BUILD_DIR/.yt-dlp/bin"
 INSTALL_PATH="$INSTALL_DIR/yt-dlp"
 mkdir -p "$INSTALL_DIR"
-
-echo 'Downloading latest stable version of yt-dlp' | indent
 
 curl -sL --fail --retry 3 --retry-connrefused --connect-timeout "${CURL_CONNECT_TIMEOUT:-3}" "$INSTALL_URL" -o "$INSTALL_PATH"
 chmod a+rx "$INSTALL_PATH"
@@ -30,4 +28,3 @@ export PATH="$(echo "$paths" | xargs -n 1 | sed 's/^./$HOME/' | paste -s -d ':' 
 EOF
 
 echo "Installed yt-dlp $("$INSTALL_PATH" --version) to $INSTALL_PATH" | indent
-echo 'Done' | indent
